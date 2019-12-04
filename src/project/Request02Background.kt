@@ -1,7 +1,10 @@
 package project
 
-import kotlin.concurrent.*
+import kotlin.concurrent.thread
 
 fun loadContributorsBackground(req: RequestData, callback: (List<User>) -> Unit) {
-   TODO()
+    thread {
+        val users = loadContributorsBlocking(req)
+        callback(users)
+    }
 }
