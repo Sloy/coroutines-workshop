@@ -1,11 +1,15 @@
 package project
 
-import kotlinx.coroutines.*
-import org.slf4j.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 val log: Logger = LoggerFactory.getLogger("Contributors")
 
-// todo: write actual aggregation code here
 fun List<User>.aggregate(): List<User> =
-    this
+        groupBy { it.login }
+                .mapValues { entry ->
+                    val totalContributions = entry.value.map { it.contributions }.sum()
+                    User(entry.key, totalContributions)
+                }.map { it.value }
+                .sortedByDescending { it.contributions }
 
