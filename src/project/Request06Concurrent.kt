@@ -1,11 +1,11 @@
 package project
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 
 suspend fun loadContributorsConcurrent(req: RequestData): List<User> = coroutineScope {
-    val service = createGitHubService(req.username, req.password)
+    val service = withContext(Dispatchers.Default) {
+        createGitHubService(req.username, req.password)
+    }
     log.info("Loading ${req.org} repos")
     val repos = service.listOrgRepos(req.org).await()
     log.info("${req.org}: loaded ${repos.size} repos")
