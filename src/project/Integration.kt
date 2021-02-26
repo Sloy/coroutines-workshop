@@ -7,7 +7,7 @@ import kotlin.coroutines.*
 @Suppress("UNCHECKED_CAST")
 suspend fun <T> Call<T>.await(
     noContent: (Response<T>) -> T = { errorResponse(it) }
-): T = suspendCoroutine { cont ->
+): T = suspendCancellableCoroutine { cont ->
     enqueue(object : Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
             when (response.code()) {
@@ -21,6 +21,9 @@ suspend fun <T> Call<T>.await(
             cont.resumeWithException(t)
         }
     })
+    cont.invokeOnCancellation {
+        cancel()
+    }
 }
 
 suspend fun <T> Call<List<T>>.await(): List<T> =
